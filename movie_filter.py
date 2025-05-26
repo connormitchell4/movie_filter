@@ -5,6 +5,7 @@ import platform
 import subprocess
 from pathlib import Path
 import zipfile
+import shutil
 
 parser = argparse.ArgumentParser(description="Filter IMDb ratings based on number of votes.")
 parser.add_argument("--data_path", type=str, default="./data.zip", help="Path to the IMDb ratings data csv or tsv file")
@@ -29,7 +30,6 @@ data_path = Path(args.data_path)
 
 if data_path.suffix == ".zip":
     with zipfile.ZipFile(data_path, 'r') as zip_ref:
-  
         extract_dir = data_path.parent / "unzipped_temp"
         zip_ref.extractall(extract_dir)
 
@@ -40,10 +40,13 @@ if data_path.suffix == ".zip":
                 break
 
         if extracted_file is None:
+            shutil.rmtree(extract_dir)
             raise ValueError("No .csv or .tsv file found inside the .zip archive.")
 
         sep = "\t" if extracted_file.suffix == ".tsv" else ","
         data = pd.read_csv(extracted_file, sep=sep)
+
+    shutil.rmtree(extract_dir)
 
 elif data_path.suffix == ".tsv":
     data = pd.read_csv(data_path, sep="\t")
