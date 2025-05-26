@@ -4,9 +4,10 @@ import os
 import platform
 import subprocess
 from pathlib import Path
+import zipfile
 
 parser = argparse.ArgumentParser(description="Filter IMDb ratings based on number of votes.")
-parser.add_argument("--data_path", type=str, default="./data.csv", help="Path to the IMDb ratings data csv or tsv file")
+parser.add_argument("--data_path", type=str, default="./data.zip", help="Path to the IMDb ratings data csv or tsv file")
 parser.add_argument("--min_votes", type=int, default=100000, help="Minimum number of votes to filter ratings")
 parser.add_argument("--max_votes", type=int, default=-1, help="Maximum number of votes to filter ratings")
 parser.add_argument("--min_rating", type=float, default=0.0, help="Minimum rating to filter")
@@ -24,12 +25,34 @@ parser.add_argument("--save_path", type=str, help="Save the filtered data to a C
 parser.add_argument("--open", action="store_true", help="Automatically open the filtered data in a spreadsheet application.")
 args = parser.parse_args()
 
-if args.data_path.endswith(".tsv"):
-    data = pd.read_csv(args.data_path, sep="\t")
-elif args.data_path.endswith(".csv"):
-    data = pd.read_csv(args.data_path)
+data_path = Path(args.data_path)
+
+if data_path.suffix == ".zip":
+    with zipfile.ZipFile(data_path, 'r') as zip_ref:
+  
+        extract_dir = data_path.parent / "unzipped_temp"
+        zip_ref.extractall(extract_dir)
+
+        extracted_file = None
+        for file in extract_dir.iterdir():
+            if file.suffix in [".csv", ".tsv"]:
+                extracted_file = file
+                break
+
+        if extracted_file is None:
+            raise ValueError("No .csv or .tsv file found inside the .zip archive.")
+
+        sep = "\t" if extracted_file.suffix == ".tsv" else ","
+        data = pd.read_csv(extracted_file, sep=sep)
+
+elif data_path.suffix == ".tsv":
+    data = pd.read_csv(data_path, sep="\t")
+
+elif data_path.suffix == ".csv":
+    data = pd.read_csv(data_path)
+
 else:
-    raise ValueError("Unsupported file format. Please provide a .csv or .tsv file.")
+    raise ValueError("Unsupported file format. Please provide a zipped or unzipped .csv or .tsv file.")
 
 data = data[data["numVotes"] >= args.min_votes]
 if args.max_votes > -1:
@@ -68,7 +91,7 @@ data = data[data["startYear"] >= int(args.min_year)] if args.min_year else data
 data.sort_values(by="averageRating", ascending=False, inplace=True)
 
 print(f"\n🎬 {len(data)} movies found after filtering.🎬\n")
-print(f"\nShowing the top {args.num_movies}:\n")
+print(f"\nShowing the top {min(args.num_movies, len(data))}:\n")
 #---------------#
 print(f"{'Title':<50} {'Rating':<6} {'Genres':<30} {'Runtime':<8} {'Year':<6}")
 print("-" * 110)
