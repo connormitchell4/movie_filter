@@ -13,13 +13,13 @@ parser.add_argument("--min_votes", type=int, default=100000, help="Minimum numbe
 parser.add_argument("--max_votes", type=int, default=-1, help="Maximum number of votes to filter ratings")
 parser.add_argument("--min_rating", type=float, default=0.0, help="Minimum rating to filter")
 parser.add_argument("--max_rating", type=float, default=10.0, help="Maximum rating to filter")
-parser.add_argument("--title_types", type=str, default="movie, tvMovie", help=r"Type of title to filter ('all', 'movie', 'short', 'tvEpisode', 'tvMiniSeries', 'tvMovie', 'tvSeries', 'tvShort', 'tvSpecial', 'video', 'videoGame')")
+parser.add_argument("--title_types", type=str, default="movie, tvMovie, short, video", help=r"Type of title to filter ('all', 'movie', 'short', 'tvEpisode', 'tvMiniSeries', 'tvMovie', 'tvSeries', 'tvShort', 'tvSpecial', 'video', 'videoGame')")
 parser.add_argument("--include_genres", type=str, 
                     help="Genres to filter. Omit if you want all. (comma-separated: 'Documentary', 'Adventure', 'Game-Show', 'Short', 'Action', 'Film-Noir', 'Music', 'Sport', 'Talk-Show', 'Western', 'War', 'Sci-Fi', 'Fantasy', 'Romance', 'News', 'Family', 'Reality-TV', 'Drama', 'Animation', 'Comedy', 'History', 'Mystery', 'Musical', 'Thriller', 'Crime', 'Adult', 'Horror', 'Biography')")
 parser.add_argument("--exclude_genres", type=str, 
                     help="Genres to filter. Omit if you want all. (comma-separated: 'Documentary', 'Adventure', 'Game-Show', 'Short', 'Action', 'Film-Noir', 'Music', 'Sport', 'Talk-Show', 'Western', 'War', 'Sci-Fi', 'Fantasy', 'Romance', 'News', 'Family', 'Reality-TV', 'Drama', 'Animation', 'Comedy', 'History', 'Mystery', 'Musical', 'Thriller', 'Crime', 'Adult', 'Horror', 'Biography')")
-parser.add_argument("--max_runtime", type=str, help="Maximum runtime to filter in minutes. (e.g., '90')")
-parser.add_argument("--min_runtime", type=str, help="Minimum runtime to filter in minutes. (e.g., '30')")
+parser.add_argument("--max_runtime", default=210, type=str, help="Maximum runtime to filter in minutes. (e.g., '90')")
+parser.add_argument("--min_runtime", default=0, type=str, help="Minimum runtime to filter in minutes. (e.g., '30')")
 parser.add_argument("--min_year", type=int, help="Earliest year to filter from (e.g., '2000')")
 parser.add_argument("--num_movies", type=int, help="Number of movies to display after filtering. Default is 20.", default=20)
 parser.add_argument("--save_path", type=str, help="Save the filtered data to a CSV file. Provide the file name (e.g., 'data_filtered.csv').")
